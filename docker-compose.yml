@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: hms
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_PASSWORD: Chathu123Secure
       POSTGRES_DB: hms
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -44,7 +44,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 4000
-      DATABASE_URL: postgresql://hms:${POSTGRES_PASSWORD:-change_me_in_production}@postgres:5432/hms
+      DATABASE_URL: postgresql://hms:Chathu123Secure@postgres:5432/hms
       REDIS_URL: redis://redis:6379
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set a long random secret in .env}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set a different long random secret in .env}

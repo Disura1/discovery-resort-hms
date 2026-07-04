@@ -29,7 +29,7 @@ export function AppLayout() {
     <div className="flex h-screen bg-ink-50">
       <aside className="w-56 shrink-0 border-r border-ink-200 bg-white flex flex-col">
         <div className="px-5 py-5 border-b border-ink-200">
-          <p className="text-sm text-ink-400">Grand Lotus Hotel</p>
+          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
           <p className="font-semibold text-brand-800">Staff Console</p>
         </div>
         <nav className="flex-1 px-3 py-4 space-y-1">

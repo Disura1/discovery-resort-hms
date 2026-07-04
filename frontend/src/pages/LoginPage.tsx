@@ -30,7 +30,7 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-ink-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <p className="text-sm text-ink-400">Grand Lotus Hotel</p>
+          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
           <h1 className="text-xl font-semibold text-brand-800">Staff sign in</h1>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-ink-200 bg-white p-6">
@@ -73,7 +73,7 @@ export function LoginPage() {
           </button>
         </form>
         <p className="mt-4 text-center text-xs text-ink-400">
-          Demo: manager@grandlotus.test / ManagerPass123!
+       
         </p>
       </div>
     </div>

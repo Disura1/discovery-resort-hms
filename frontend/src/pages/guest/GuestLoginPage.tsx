@@ -76,7 +76,7 @@ export function GuestLoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-ink-50 px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <p className="text-sm text-ink-400">Grand Lotus Hotel</p>
+          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
           <h1 className="text-xl font-semibold text-brand-800">Guest sign in</h1>
         </div>
 

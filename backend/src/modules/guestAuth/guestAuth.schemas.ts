@@ -1,15 +1,14 @@
 import { z } from "zod";
 
-export const requestOtpSchema = z.object({
-  email: z.string().email()
+export const registerGuestSchema = z.object({
+  fullName: z.string().min(2).max(150),
+  email: z.string().email(),
+  password: z.string().min(8).max(100)
 });
 
-export const verifyOtpSchema = z.object({
+export const guestLoginSchema = z.object({
   email: z.string().email(),
-  code: z.string().length(6).regex(/^\d+$/, "Code must be 6 digits"),
-  // Only used the first time a guest logs in with a brand-new email, so we
-  // have a name to put on the guest record and on the room they book.
-  fullName: z.string().min(2).max(150).optional()
+  password: z.string().min(8)
 });
 
 export const guestRefreshSchema = z.object({

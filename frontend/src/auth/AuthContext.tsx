@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode
+} from "react";
+
 import { authApi } from "../api/endpoints";
 import { setAccessToken, setUnauthorizedHandler } from "../api/client";
 import type { AuthUser } from "../api/types";
@@ -14,41 +22,39 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setUnauthorizedHandler(() => setUser(null));
-    // Attempt to silently restore a session using the httpOnly refresh cookie.
-    (async () => {
-      try {
-        const res = await fetch("/api/auth/refresh", { method: "POST", credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          setAccessToken(data.accessToken);
-          const me = await authApi.me();
-          setUser((me.data.user as unknown as AuthUser) ?? null);
-        }
-      } catch {
-        // No valid session; user needs to log in.
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    setUnauthorizedHandler(() => {
+      setAccessToken(null);
+      setUser(null);
+    });
   }, []);
+
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isLoading,
+
       login: async (email, password) => {
-        const res = await authApi.login(email, password);
-        setAccessToken(res.data.accessToken);
-        setUser(res.data.staff);
+        setIsLoading(true);
+        try {
+          const res = await authApi.login(email, password);
+          setAccessToken(res.data.accessToken);
+          setUser(res.data.staff);
+        } finally {
+          setIsLoading(false);
+        }
       },
+
       logout: async () => {
-        await authApi.logout();
-        setAccessToken(null);
-        setUser(null);
+        try {
+          await authApi.logout();
+        } finally {
+          setAccessToken(null);
+          setUser(null);
+        }
       }
     }),
     [user, isLoading]
@@ -59,6 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return ctx;
 }

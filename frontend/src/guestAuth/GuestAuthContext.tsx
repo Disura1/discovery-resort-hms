@@ -5,8 +5,8 @@ import { setGuestAccessToken, setGuestUnauthorizedHandler } from "../api/guestCl
 interface GuestAuthContextValue {
   guest: GuestProfile | null;
   isLoading: boolean;
-  requestOtp: (email: string) => Promise<void>;
-  verifyOtp: (email: string, code: string, fullName?: string) => Promise<void>;
+  register: (fullName: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -39,11 +39,13 @@ export function GuestAuthProvider({ children }: { children: ReactNode }) {
     () => ({
       guest,
       isLoading,
-      requestOtp: async (email) => {
-        await guestAuthApi.requestOtp(email);
+      register: async (fullName, email, password) => {
+        const res = await guestAuthApi.register(fullName, email, password);
+        setGuestAccessToken(res.data.accessToken);
+        setGuest(res.data.guest);
       },
-      verifyOtp: async (email, code, fullName) => {
-        const res = await guestAuthApi.verifyOtp(email, code, fullName);
+      login: async (email, password) => {
+        const res = await guestAuthApi.login(email, password);
         setGuestAccessToken(res.data.accessToken);
         setGuest(res.data.guest);
       },

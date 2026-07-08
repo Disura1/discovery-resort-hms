@@ -16,16 +16,16 @@ function setRefreshCookie(res: Response, token: string) {
 }
 
 export const guestAuthController = {
-  requestOtp: asyncHandler(async (req: Request, res: Response) => {
-    await guestAuthService.requestOtp(req.body.email);
-    // Always a generic 200, whether or not the email is new — avoids
-    // confirming/denying which addresses have booked with the hotel before.
-    res.json({ message: "If that email is valid, a login code has been sent." });
+  register: asyncHandler(async (req: Request, res: Response) => {
+    const { fullName, email, password } = req.body;
+    const result = await guestAuthService.register(fullName, email, password);
+    setRefreshCookie(res, result.refreshToken);
+    res.status(201).json({ accessToken: result.accessToken, guest: result.guest });
   }),
 
-  verifyOtp: asyncHandler(async (req: Request, res: Response) => {
-    const { email, code, fullName } = req.body;
-    const result = await guestAuthService.verifyOtp(email, code, fullName);
+  login: asyncHandler(async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const result = await guestAuthService.login(email, password);
     setRefreshCookie(res, result.refreshToken);
     res.json({ accessToken: result.accessToken, guest: result.guest });
   }),

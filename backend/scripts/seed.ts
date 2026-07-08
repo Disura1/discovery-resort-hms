@@ -9,17 +9,17 @@ async function main() {
 
   const { rows: propRows } = await pool.query(
     `INSERT INTO properties (name, address, timezone, currency)
-     VALUES ('Grand Lotus Hotel', '12 Galle Road, Colombo 03, Sri Lanka', 'Asia/Colombo', 'LKR')
+     VALUES ('Discovery Resort', 'Muwanthenna Rd, Sri Lanka', 'Asia/Rathnapura', 'LKR')
      RETURNING id`
   );
   const propertyId = propRows[0].id;
 
   const staffAccounts = [
-    { name: "Amara Perera", email: "owner@grandlotus.test", role: "OWNER", password: "OwnerPass123!" },
-    { name: "Kasun Fernando", email: "manager@grandlotus.test", role: "MANAGER", password: "ManagerPass123!" },
-    { name: "Dilani Silva", email: "frontdesk@grandlotus.test", role: "FRONT_DESK", password: "FrontDesk123!" },
-    { name: "Nimal Rathnayake", email: "housekeeping@grandlotus.test", role: "HOUSEKEEPING", password: "Housekeep123!" },
-    { name: "Ishara Jayasuriya", email: "accounts@grandlotus.test", role: "ACCOUNTANT", password: "Accounts123!" }
+    { name: "Amara Perera", email: "owner@discoveryresort.test", role: "OWNER", password: "OwnerPass123!" },
+    { name: "Kasun Fernando", email: "manager@discoveryresort.test", role: "MANAGER", password: "ManagerPass123!" },
+    { name: "Dilani Silva", email: "frontdesk@discoveryresort.test", role: "FRONT_DESK", password: "FrontDesk123!" },
+    { name: "Nimal Rathnayake", email: "housekeeping@discoveryresort.test", role: "HOUSEKEEPING", password: "Housekeep123!" },
+    { name: "Ishara Jayasuriya", email: "accounts@discoveryresort.test", role: "ACCOUNTANT", password: "Accounts123!" }
   ];
 
   for (const acc of staffAccounts) {

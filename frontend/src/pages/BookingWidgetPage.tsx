@@ -83,7 +83,7 @@ export function BookingWidgetPage() {
     <div className="min-h-screen bg-ink-50 py-10 px-4">
       <div className="max-w-lg mx-auto space-y-6">
         <div className="text-center">
-          <p className="text-sm text-ink-400">Grand Lotus Hotel</p>
+          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
           <h1 className="text-xl font-semibold text-brand-800">Book your stay</h1>
         </div>
 

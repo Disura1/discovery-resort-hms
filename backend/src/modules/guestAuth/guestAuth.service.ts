@@ -1,59 +1,66 @@
-import crypto from "crypto";
 import { guestAuthRepository } from "./guestAuth.repository";
 import { guestsRepository } from "../guests/guests.repository";
+import { hashPassword, verifyPassword } from "../../utils/password";
 import { signGuestAccessToken, generateGuestRefreshToken, hashGuestRefreshToken } from "../../utils/guestJwt";
-import { sendMail } from "../../utils/mailer";
 import { AppError } from "../../utils/AppError";
 import { env } from "../../config/env";
 
-function generateOtp(): string {
-  // A cryptographically random 6-digit code, not Math.random().
-  return crypto.randomInt(0, 1_000_000).toString().padStart(6, "0");
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
+
+function toProfile(guest: { id: string; full_name: string; email: string | null }) {
+  return { id: guest.id, fullName: guest.full_name, email: guest.email };
 }
 
 export const guestAuthService = {
-  async requestOtp(email: string) {
-    const allowed = await guestAuthRepository.canRequestOtp(email);
-    if (!allowed) {
-      throw AppError.tooManyRequests("Please wait a minute before requesting another code.");
+  async register(fullName: string, email: string, password: string) {
+    const existing = await guestsRepository.findByEmail(email);
+    if (existing?.password_hash) {
+      throw AppError.conflict("An account with this email already exists. Please log in instead.");
     }
 
-    const code = generateOtp();
-    await guestAuthRepository.storeOtp(email, code);
+    const passwordHash = await hashPassword(password);
+    const guest = existing
+      ? await guestsRepository.attachPassword(existing.id, passwordHash, fullName)
+      : await guestsRepository.create({ fullName, email, passwordHash });
 
-    await sendMail(
-      email,
-      "Your Grand Lotus Hotel login code",
-      `Your login code is ${code}. It expires in ${env.GUEST_OTP_TTL_MINUTES} minutes. If you didn't request this, you can ignore this email.`,
-      `<p>Your login code is <strong style="font-size:20px">${code}</strong>.</p><p>It expires in ${env.GUEST_OTP_TTL_MINUTES} minutes. If you didn't request this, you can ignore this email.</p>`
-    );
+    return this.issueSession(guest);
   },
 
-  async verifyOtp(email: string, code: string, fullNameIfNew: string | undefined) {
-    const result = await guestAuthRepository.verifyOtp(email, code);
+  async login(email: string, password: string) {
+    const guest = await guestsRepository.findByEmail(email);
 
-    if (result === "EXPIRED") {
-      throw AppError.badRequest("This code has expired. Please request a new one.");
-    }
-    if (result === "LOCKED") {
-      throw AppError.tooManyRequests("Too many incorrect attempts. Please request a new code.");
-    }
-    if (result === "INVALID") {
-      throw AppError.badRequest("That code is incorrect. Please check and try again.");
+    // Same generic error whether the account doesn't exist, was never
+    // registered with a password, or the password is wrong — avoids
+    // leaking which emails have accounts.
+    const genericError = () => AppError.unauthorized("Invalid email or password");
+
+    if (!guest || !guest.password_hash) throw genericError();
+
+    if (guest.locked_until && guest.locked_until > new Date()) {
+      throw AppError.forbidden("Account temporarily locked due to repeated failed login attempts. Please try again later.");
     }
 
-    const guest = await guestsRepository.findOrCreateByEmail(email, fullNameIfNew?.trim() || "Guest");
+    const passwordValid = await verifyPassword(password, guest.password_hash);
+    if (!passwordValid) {
+      const attempts = await guestsRepository.registerFailedLogin(guest.id);
+      if (attempts >= MAX_FAILED_ATTEMPTS) {
+        const until = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000);
+        await guestsRepository.lockAccount(guest.id, until);
+      }
+      throw genericError();
+    }
 
+    await guestsRepository.resetFailedLogins(guest.id);
+    return this.issueSession(guest);
+  },
+
+  async issueSession(guest: { id: string; full_name: string; email: string | null }) {
     const accessToken = signGuestAccessToken(guest.id);
     const { token: refreshToken, hash } = generateGuestRefreshToken();
     const expiresAt = new Date(Date.now() + env.GUEST_REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000);
     await guestAuthRepository.storeRefreshToken(guest.id, hash, expiresAt);
-
-    return {
-      accessToken,
-      refreshToken,
-      guest: { id: guest.id, fullName: guest.full_name, email: guest.email }
-    };
+    return { accessToken, refreshToken, guest: toProfile(guest) };
   },
 
   async refresh(refreshToken: string) {

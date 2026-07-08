@@ -13,9 +13,14 @@ export interface GuestBooking extends Reservation {
 }
 
 export const guestAuthApi = {
-  requestOtp: (email: string) => guestApi.post("/guest-auth/request-otp", { email }),
-  verifyOtp: (email: string, code: string, fullName?: string) =>
-    guestApi.post<{ accessToken: string; guest: GuestProfile }>("/guest-auth/verify-otp", { email, code, fullName }),
+  register: (fullName: string, email: string, password: string) =>
+    guestApi.post<{ accessToken: string; guest: GuestProfile }>("/guest-auth/register", {
+      fullName,
+      email,
+      password
+    }),
+  login: (email: string, password: string) =>
+    guestApi.post<{ accessToken: string; guest: GuestProfile }>("/guest-auth/login", { email, password }),
   logout: () => guestApi.post("/guest-auth/logout"),
   me: () => guestApi.get<{ guest: GuestProfile }>("/guest/me")
 };

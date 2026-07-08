@@ -16,7 +16,7 @@ export function GuestLayout() {
       <header className="border-b border-ink-200 bg-white">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <p className="text-xs text-ink-400">Grand Lotus Hotel</p>
+            <p className="text-xs text-ink-400">Discovery-Resort-Muwanthanna</p>
             <p className="font-semibold text-brand-800">Guest Portal</p>
           </div>
           <nav className="flex items-center gap-1">

@@ -1,6 +1,8 @@
-import { execSync } from "child_process";
+/// <reference types="node" />
+import { execSync } from "child_process"; // Node.js built-in module
+import type { Config } from '@jest/types';
 
-module.exports = async () => {
+export default async () => {
   process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/hms_test";
   // Reset the schema so tests always start from a clean, known state.
   execSync(

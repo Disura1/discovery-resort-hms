@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useGuestAuth } from "../../guestAuth/GuestAuthContext";
 
 export function GuestLoginPage() {
@@ -16,28 +16,41 @@ export function GuestLoginPage() {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
+
     try {
       await login(email, password);
-      const from = (location.state as { from?: string })?.from ?? "/guest";
+
+      const from =
+        (location.state as { from?: string } | null)?.from ?? "/guest";
+
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(err?.response?.data?.error?.message ?? "Invalid email or password.");
+      setError(
+        err?.response?.data?.error?.message ?? "Invalid email or password."
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ink-50 px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
-          <h1 className="text-xl font-semibold text-brand-800">Guest sign in</h1>
+    <div className="min-h-screen bg-ink-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="mb-6 text-center">
+          <h1 className="text-xl font-semibold text-brand-800">
+            Guest sign in
+          </h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border border-ink-200 bg-white p-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 rounded-lg border border-ink-200 bg-white p-6"
+        >
           <div>
-            <label className="block text-sm font-medium text-ink-800 mb-1" htmlFor="email">
+            <label
+              className="block text-sm font-medium text-ink-800 mb-1"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -51,8 +64,12 @@ export function GuestLoginPage() {
               placeholder="you@example.com"
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-ink-800 mb-1" htmlFor="password">
+            <label
+              className="block text-sm font-medium text-ink-800 mb-1"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -66,7 +83,9 @@ export function GuestLoginPage() {
               placeholder="••••••••"
             />
           </div>
+
           {error && <p className="text-sm text-danger-600">{error}</p>}
+
           <button
             type="submit"
             disabled={submitting}
@@ -74,6 +93,7 @@ export function GuestLoginPage() {
           >
             {submitting ? "Signing in…" : "Sign in"}
           </button>
+
           <p className="text-xs text-ink-400 text-center">
             New here?{" "}
             <Link to="/guest/register" className="text-brand-600 hover:underline">

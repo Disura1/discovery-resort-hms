@@ -26,7 +26,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().default(587),
   SMTP_USER: z.string().default(""),
   SMTP_PASS: z.string().default(""),
-  SMTP_FROM: z.string().default("Grand Lotus Hotel <no-reply@grandlotus.test>"),
+  SMTP_FROM: z.string().default("Discovery-Resort-Muwanthanna <no-reply@discoveryresortmuwanthanna.test>"),
   SMTP_SECURE: z.coerce.boolean().default(false),
 
   STRIPE_SECRET_KEY: z.string().default(""),
@@ -37,8 +37,7 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  // eslint-disable-next-line no-console
-  console.error("Invalid environment configuration:", parsed.error.flatten().fieldErrors);
+  console.log(JSON.stringify(parsed.error.format(), null, 2));
   process.exit(1);
 }
 

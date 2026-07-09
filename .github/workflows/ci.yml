@@ -9,6 +9,7 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:16-alpine
@@ -16,15 +17,18 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: hms_test
-        ports: ["5432:5432"]
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
       redis:
         image: redis:7-alpine
-        ports: ["6379:6379"]
+        ports:
+          - "6379:6379"
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
@@ -49,7 +53,8 @@ jobs:
 
       - name: Enable btree_gist extension
         run: |
-          sudo apt-get update && sudo apt-get install -y postgresql-client
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
           PGPASSWORD=postgres psql -h localhost -U postgres -d hms_test -c "CREATE EXTENSION IF NOT EXISTS btree_gist;"
 
       - name: Type-check
@@ -61,14 +66,34 @@ jobs:
       - name: Run tests
         run: npm test
         env:
+          NODE_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/hms_test
           REDIS_URL: redis://localhost:6379/1
+          JWT_ACCESS_SECRET: test-secret-access-token-key
+          JWT_REFRESH_SECRET: test-secret-refresh-token-key
+          JWT_GUEST_ACCESS_SECRET: test-secret-guest-access-key
+          JWT_GUEST_REFRESH_SECRET: test-secret-guest-refresh-key
+          ACCESS_TOKEN_TTL: 15m
+          REFRESH_TOKEN_TTL_DAYS: 30
+          GUEST_ACCESS_TOKEN_TTL: 30m
+          GUEST_REFRESH_TOKEN_TTL_DAYS: 90
+          GUEST_OTP_TTL_MINUTES: 10
+          SMTP_HOST: ""
+          SMTP_PORT: 587
+          SMTP_USER: ""
+          SMTP_PASS: ""
+          SMTP_FROM: "Discovery Resort Muwanthanna <no-reply@test.com>"
+          SMTP_SECURE: false
+          STRIPE_SECRET_KEY: ""
+          STRIPE_WEBHOOK_SECRET: ""
+          CORS_ORIGIN: "*"
 
       - name: Build
         run: npm run build
 
   frontend:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: frontend

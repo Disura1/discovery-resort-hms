@@ -1,7 +1,10 @@
 import pino from "pino";
 import { env } from "../config/env";
 
+const isDevelopment = env.NODE_ENV === "development";
+const isTest = env.NODE_ENV === "test";
+
 export const logger = pino({
-  level: env.NODE_ENV === "production" ? "info" : "debug",
-  transport: env.NODE_ENV !== "production" ? { target: "pino-pretty", options: { colorize: true } } : undefined
+  level: isDevelopment ? "debug" : "info",
+  enabled: !isTest
 });

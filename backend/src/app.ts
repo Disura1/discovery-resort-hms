@@ -22,6 +22,7 @@ import foliosRoutes from "./modules/folios/folios.routes";
 import webhookRoutes from "./modules/payments/webhook.routes";
 import reportsRoutes from "./modules/reports/reports.routes";
 import housekeepingRoutes from "./modules/housekeeping/housekeeping.routes";
+import mediaRoutes from "./modules/media/media.routes";
 
 export function createApp() {
   const app = express();
@@ -58,6 +59,7 @@ export function createApp() {
   app.use("/api/folios", foliosRoutes);
   app.use("/api/reports", reportsRoutes);
   app.use("/api/housekeeping", housekeepingRoutes);
+  app.use("/api/media", mediaRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

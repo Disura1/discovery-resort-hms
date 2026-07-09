@@ -37,6 +37,7 @@ export function GuestLoginPage() {
     <div className="min-h-screen bg-ink-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
+          <p className="text-sm text-ink-400">Discovery-Resort-Muwanthanna</p>
           <h1 className="text-xl font-semibold text-brand-800">
             Guest sign in
           </h1>
